@@ -3,7 +3,7 @@
 </h1>
 
 <h3 align="center">
-  Desafio 2: FasFeet
+  Desafio 3: FasFeet, continuando a aplicação
 </h3>
 
 ### 🎯 Sobre o desafio
