@@ -17,12 +17,12 @@ class CourierController {
     }
 
     const couriers = await Courier.findAll({
-      attributes: ['id', 'name', 'email', 'avatar_id'],
+      attributes: ['id', 'name', 'email'],
       include: [
         {
           model: File,
           as: 'avatar',
-          attributes: ['name', 'path', 'url'],
+          attributes: ['id', 'path', 'url'],
         },
       ],
     });
@@ -57,17 +57,7 @@ class CourierController {
 
     const { id, name, avatar_id, email } = await Courier.create(req.body);
 
-    return res.json({
-      deliveryman: {
-        id,
-        name,
-        avatar_id,
-        email,
-      },
-      token: jwt.sign({ id }, authConfig.secret, {
-        expiresIn: authConfig.expiresIn,
-      }),
-    });
+    return res.json(id, name, avatar_id, email);
   }
 
   async update(req, res) {
@@ -144,9 +134,11 @@ class CourierController {
       return res.status(400).json({ error: 'This email already exists' });
     }
 
-    await deliveryman.destroy();
+    if (confirm('Tem certeza que deseja excluir este entregador')) {
+      await deliveryman.destroy();
 
-    return res.json(deliveryman);
+      return res.json(deliveryman);
+    }
   }
 }
 

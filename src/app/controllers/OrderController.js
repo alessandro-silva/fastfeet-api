@@ -16,8 +16,7 @@ class OrderController {
     }
 
     const orders = await Order.findAll({
-      where: { canceled_at: null },
-      attributes: ['id', 'product', 'start_date', 'end_date'],
+      attributes: ['id', 'product', 'canceled_at', 'start_date', 'end_date'],
       include: [
         {
           model: Recipient,
@@ -41,7 +40,7 @@ class OrderController {
         {
           model: File,
           as: 'signature',
-          attributes: ['id', 'path'],
+          attributes: ['id', 'path', 'url'],
         },
       ],
     });
@@ -137,13 +136,24 @@ class OrderController {
       return res.status(401).json({ error: 'This recipient already exists' });
     }
 
+    const recipient = await Recipient.findByPk(order.recipient_id);
+
     if (deliveryman_id !== order.deliveryman_id) {
       return res.status(401).json({ error: 'This deliveryman already exists' });
     }
 
-    await order.destroy();
+    if (confirm('Tem certeza que deseja cancelar está encomenda')) {
+      order.canceled_at = new Date();
 
-    return res.json(order);
+      await order.save();
+
+      await Notification.create({
+        content: `A encomenda de ${recipient.name} foi cancelada devido a causa de problema com a entrega`,
+        user: order.deliveryman_id,
+      });
+
+      return res.json(order);
+    }
   }
 }
 

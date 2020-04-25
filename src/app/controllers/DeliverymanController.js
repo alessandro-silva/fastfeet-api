@@ -1,5 +1,6 @@
-import { format } from 'date-fns';
+import { format, startOfDay, endOfDay, setHours, isBefore } from 'date-fns';
 import pt from 'date-fns/locale/pt';
+import { Op } from 'sequelize';
 import Courier from '../models/Courier';
 import Order from '../models/Order';
 import Recipient from '../models/Recipient';
@@ -8,56 +9,22 @@ import Mail from '../../lib/Mail';
 
 class DeliverymanController {
   async index(req, res) {
-    const { id, name, email } = req.body;
+    const { id } = req.body;
 
-    if (id !== req.userId) {
-      return res.status(401).json({ error: 'Invalid id' });
-    }
-
-    const nameExists = await Courier.findOne({
-      where: { id: req.userId, name },
+    const exists = await Courier.findOne({
+      where: { id },
     });
 
-    if (!nameExists) {
-      return res.status(401).json({ error: 'Invalid name' });
-    }
-
-    const emailExists = await Courier.findOne({
-      where: { id: req.userId, email },
-    });
-
-    if (!emailExists) {
-      return res.status(401).json({ error: 'Invalid email' });
+    if (!exists) {
+      return res.status(401).json({ error: 'Deliveryman does not exist' });
     }
 
     const orders = await Order.findAll({
       where: {
-        deliveryman_id: req.userId,
+        deliveryman_id: id,
         canceled_at: null,
-        start_date: null,
+        end_date: null,
       },
-      attributes: ['id', 'canceled_at', 'start_date', 'end_date'],
-      include: [
-        {
-          model: Recipient,
-          as: 'recipient',
-          attributes: [
-            'id',
-            'name',
-            'street',
-            'number',
-            'complement',
-            'state',
-            'city',
-            'zip_code',
-          ],
-        },
-        {
-          model: Courier,
-          as: 'deliveryman',
-          attributes: ['id', 'name', 'email'],
-        },
-      ],
     });
 
     return res.json(orders);
@@ -65,18 +32,45 @@ class DeliverymanController {
 
   async store(req, res) {
     const order = await Order.findByPk(req.params.id);
+    const { date } = req.query;
 
-    if (order.deliveryman_id !== req.userId) {
-      return res
-        .status(401)
-        .json({ error: "You don't have permission to start this order." });
+    if (!date) {
+      return res.status(400).json({ error: 'Invalid date' });
     }
 
-    order.start_date = new Date();
+    const searchDate = Number(date);
 
-    await order.save();
+    if (order.canceled_at !== null || order.start_date !== null) {
+      return res.status(401).json({ error: 'Order unavailable' });
+    }
 
-    return res.json(order);
+    const withdrawals = await Order.count({
+      where: {
+        deliveryman_id: order.deliveryman_id,
+        canceled_at: null,
+        start_date: {
+          [Op.between]: [startOfDay(searchDate), endOfDay(searchDate)],
+        },
+      },
+    });
+
+    if (withdrawals === 5) {
+      return res
+        .status(401)
+        .json({ error: 'time unavailable for withdrawals' });
+    }
+
+    if (
+      isBefore(new Date(), setHours(startOfDay(searchDate), 8)) ||
+      isBefore(new Date(), setHours(startOfDay(searchDate), 18))
+    ) {
+      order.start_date = new Date();
+
+      await order.save();
+
+      return res.json(order);
+    }
+    return res.status(401).json({ error: 'Schedule not allowed' });
   }
 
   async update(req, res) {
@@ -94,11 +88,11 @@ class DeliverymanController {
 
     const order = await Order.findByPk(req.params.id);
 
-    if (order.deliveryman_id !== req.userId) {
-      return res
-        .status(401)
-        .json({ error: "You don't have permission to start this order." });
-    }
+    // if (order.deliveryman_id !== req.userId) {
+    //   return res
+    //     .status(401)
+    //     .json({ error: "You don't have permission to start this order." });
+    // }
 
     order.signature_id = signature_id;
 
@@ -125,30 +119,36 @@ class DeliverymanController {
       ],
     });
 
-    if (order.deliveryman_id !== req.userId) {
-      return res
-        .status(401)
-        .json({ error: "You don't have permission to cancel this order." });
+    // if (order.deliveryman_id !== req.userId) {
+    //   return res
+    //     .status(401)
+    //     .json({ error: "You don't have permission to cancel this order." });
+    // }
+
+    if (confirm('Tem certeza que deseja excluir esta encomenda')) {
+      order.canceled_at = new Date();
+
+      await order.save();
+
+      await Mail.sendMail({
+        to: `${order.recipient.name} <${order.recipient.city}>`,
+        subject: 'Encomenda cancelada',
+        template: 'cancellation',
+        context: {
+          recipient: order.recipient.name,
+          deliveryman: order.deliveryman.name,
+          canceled: format(
+            order.canceled_at,
+            "'dia' dd 'de' MMMM', às' H:mm'h",
+            {
+              locale: pt,
+            }
+          ),
+        },
+      });
+
+      return res.json(order);
     }
-
-    order.canceled_at = new Date();
-
-    await order.save();
-
-    await Mail.sendMail({
-      to: `${order.recipient.name} <${order.recipient.city}>`,
-      subject: 'Encomenda cancelada',
-      template: 'cancellation',
-      context: {
-        recipient: order.recipient.name,
-        deliveryman: order.deliveryman.name,
-        canceled: format(order.canceled_at, "'dia' dd 'de' MMMM', às' H:mm'h", {
-          locale: pt,
-        }),
-      },
-    });
-
-    return res.json(order);
   }
 }
 
