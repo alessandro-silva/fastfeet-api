@@ -3,7 +3,7 @@
 </h1>
 
 <h3 align="center">
-  Post Office Management App made with Express
+  App de gerenciamento de agência postal feito com Express
 </h3>
 
 ### 🎯 Sobre o Projeto
