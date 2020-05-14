@@ -35,6 +35,13 @@ class OrderFilterController {
           model: Courier,
           as: 'deliveryman',
           attributes: ['id', 'name', 'email'],
+	  include: [
+	   {
+	    model: File,
+	    as: 'avatar',
+	    attributes: ['id', 'path', 'url'],			   
+	   },	
+	  ],
         },
         {
           model: File,

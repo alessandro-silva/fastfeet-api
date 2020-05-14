@@ -125,30 +125,24 @@ class DeliverymanController {
     //     .json({ error: "You don't have permission to cancel this order." });
     // }
 
-    if (confirm('Tem certeza que deseja excluir esta encomenda')) {
-      order.canceled_at = new Date();
+    order.canceled_at = new Date();
 
-      await order.save();
+    await order.save();
 
-      await Mail.sendMail({
-        to: `${order.recipient.name} <${order.recipient.city}>`,
-        subject: 'Encomenda cancelada',
-        template: 'cancellation',
-        context: {
-          recipient: order.recipient.name,
-          deliveryman: order.deliveryman.name,
-          canceled: format(
-            order.canceled_at,
-            "'dia' dd 'de' MMMM', às' H:mm'h",
-            {
-              locale: pt,
-            }
-          ),
-        },
-      });
+    await Mail.sendMail({
+      to: `${order.recipient.name} <${order.recipient.city}>`,
+      subject: 'Encomenda cancelada',
+      template: 'cancellation',
+      context: {
+        recipient: order.recipient.name,
+        deliveryman: order.deliveryman.name,
+        canceled: format(order.canceled_at, "'dia' dd 'de' MMMM', às' H:mm'h", {
+          locale: pt,
+        }),
+      },
+    });
 
-      return res.json(order);
-    }
+    return res.json(order);
   }
 }
 

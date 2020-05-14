@@ -17,7 +17,7 @@ import ProblemController from './app/controllers/ProblemController';
 import ProblemFilterController from './app/controllers/ProblemFilterController';
 import NotificationController from './app/controllers/NotificationController';
 
-import authMiddeware from './app/middlewares/auth';
+import authMiddleware from './app/middlewares/auth';
 
 const routes = new Router();
 const upload = multer(multerConfig);
@@ -25,20 +25,22 @@ const upload = multer(multerConfig);
 routes.post('/users', UserController.store);
 routes.post('/sessions', SessionController.store);
 
-routes.use(authMiddeware);
+routes.use(authMiddleware);
 
 routes.get('/recipients', RecipientController.index);
 routes.post('/recipients', RecipientController.store);
+routes.put('/recipients', RecipientController.update);
+routes.delete('/recipients/:id', RecipientController.delete);
 
 routes.get('/couriers', CourierController.index);
 routes.post('/couriers', CourierController.store);
 routes.put('/couriers', CourierController.update);
-routes.delete('/couriers', CourierController.delete);
+routes.delete('/couriers/:id', CourierController.delete);
 
 routes.get('/orders', OrderController.index);
 routes.post('/orders', OrderController.store);
 routes.put('/orders', OrderController.update);
-routes.delete('/orders', OrderController.delete);
+routes.delete('/orders/:id', OrderController.delete);
 
 routes.get('/deliveryman/:id/deliveries', DeliveriesController.index);
 

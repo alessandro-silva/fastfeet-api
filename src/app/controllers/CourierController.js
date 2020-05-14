@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import Courier from '../models/Courier';
 import File from '../models/File';
+import Order from '../models/Order';
 
 import authConfig from '../../config/auth';
 
@@ -122,23 +123,29 @@ class CourierController {
       return res.status(400).json({ error: 'You are not is administrador' });
     }
 
-    const { id, name, email } = req.body;
+    const { id } = req.params;
 
     const deliveryman = await Courier.findByPk(id);
 
-    if (name !== deliveryman.name) {
-      return res.status(400).json({ error: 'This name already exists' });
+    // if (name !== deliveryman.name) {
+    //   return res.status(400).json({ error: 'This name already exists' });
+    // }
+
+    // if (email !== deliveryman.email) {
+    //   return res.status(400).json({ error: 'This email already exists' });
+    // }
+
+    const order = await Order.findOne({
+      where: { deliveryman_id: id },
+    });
+
+    if (order) {
+      return res.status(401).json({ error: 'Deliveryman bound some order' });
     }
 
-    if (email !== deliveryman.email) {
-      return res.status(400).json({ error: 'This email already exists' });
-    }
+    await deliveryman.destroy();
 
-    if (confirm('Tem certeza que deseja excluir este entregador')) {
-      await deliveryman.destroy();
-
-      return res.json(deliveryman);
-    }
+    return res.json(deliveryman);
   }
 }
 

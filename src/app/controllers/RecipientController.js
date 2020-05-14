@@ -1,5 +1,6 @@
 import User from '../models/User';
 import Recipient from '../models/Recipient';
+import Order from '../models/Order';
 
 class RecipientController {
   async index(req, res) {
@@ -25,14 +26,6 @@ class RecipientController {
       return res.status(401).json({ error: 'You are not administrador' });
     }
 
-    // const recipientExists = await Recipient.findOne({
-    //   where: { name: req.body.name },
-    // });
-
-    // if (recipientExists) {
-    //   return res.status(400).json({ error: 'Recipient already exists' });
-    // }
-
     const {
       id,
       name,
@@ -54,6 +47,68 @@ class RecipientController {
       city,
       zip_code,
     });
+  }
+
+  async update(req, res) {
+    const isAdmin = await User.findOne({
+      where: { id: req.userId, admin: false },
+    });
+
+    if (isAdmin) {
+      return res.status(401).json({ error: 'You are not administrador' });
+    }
+
+    const {
+      id,
+      name,
+      street,
+      number,
+      complement,
+      state,
+      city,
+      zip_code,
+    } = req.body;
+
+    const recipient = await Recipient.findByPk(id);
+
+    await recipient.update(req.body);
+
+    return res.json({
+      id,
+      name,
+      street,
+      number,
+      complement,
+      state,
+      city,
+      zip_code,
+    });
+  }
+
+  async delete(req, res) {
+    const isAdmin = await User.findOne({
+      where: { id: req.userId, admin: false },
+    });
+
+    if (isAdmin) {
+      return res.status(401).json({ error: 'You are not administrador' });
+    }
+
+    const { id } = req.params;
+
+    const order = await Order.findOne({
+      where: { recipient_id: id },
+    });
+
+    if (order) {
+      return res.status(401).json({ error: 'Recipient bound some order' });
+    }
+
+    const recipient = await Recipient.findByPk(id);
+
+    recipient.destroy();
+
+    return res.json(recipient);
   }
 }
 

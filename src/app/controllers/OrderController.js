@@ -3,7 +3,7 @@ import Recipient from '../models/Recipient';
 import Courier from '../models/Courier';
 import Order from '../models/Order';
 import File from '../models/File';
-import Notification from '../schemas/Notification';
+// import Notification from '../schemas/Notification';
 
 class OrderController {
   async index(req, res) {
@@ -36,6 +36,13 @@ class OrderController {
           model: Courier,
           as: 'deliveryman',
           attributes: ['id', 'name', 'email'],
+          include: [
+            {
+              model: File,
+              as: 'avatar',
+              attributes: ['id', 'path', 'url'],
+            },
+          ],
         },
         {
           model: File,
@@ -77,10 +84,10 @@ class OrderController {
       product,
     });
 
-    await Notification.create({
-      content: `Nova encomenda de ${recipient.name} já está disponível para retirada`,
-      user: deliveryman_id,
-    });
+    // await Notification.create({
+    //   content: `Nova encomenda de ${recipient.name} já está disponível para retirada`,
+    //   user: deliveryman_id,
+    // });
 
     return res.json(order);
   }
@@ -124,36 +131,23 @@ class OrderController {
       return res.status(400).json({ error: 'You are not is administrador' });
     }
 
-    const { id, recipient_id, deliveryman_id } = req.body;
+    // const { id, recipient_id, deliveryman_id } = req.body;
+    const { id } = req.params;
 
     const order = await Order.findByPk(id);
 
     if (!order) {
-      return res.status(400).json({ error: 'This id already exists' });
+      return res.status(401).json({ error: 'This id already exists' });
     }
 
-    if (recipient_id !== order.recipient_id) {
-      return res.status(401).json({ error: 'This recipient already exists' });
-    }
+    await order.destroy();
 
-    const recipient = await Recipient.findByPk(order.recipient_id);
+    // await Notification.create({
+    //   content: `A encomenda de ${recipient.name} foi cancelada devido a causa de problema com a entrega`,
+    //   user: order.deliveryman_id,
+    // });
 
-    if (deliveryman_id !== order.deliveryman_id) {
-      return res.status(401).json({ error: 'This deliveryman already exists' });
-    }
-
-    if (confirm('Tem certeza que deseja cancelar está encomenda')) {
-      order.canceled_at = new Date();
-
-      await order.save();
-
-      await Notification.create({
-        content: `A encomenda de ${recipient.name} foi cancelada devido a causa de problema com a entrega`,
-        user: order.deliveryman_id,
-      });
-
-      return res.json(order);
-    }
+    return res.json(order);
   }
 }
 
