@@ -3,7 +3,7 @@
 </h1>
 
 <h3 align="center">
-  App de Gerenciamento de Agência Postal feito com Express
+  App de Gerenciamento de Transportadora Fictícia feito com Express
 </h3>
 
 ### 🎯 Sobre o Projeto
