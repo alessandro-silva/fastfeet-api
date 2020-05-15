@@ -34,8 +34,6 @@ class ProblemController {
       return res.status(401).json({ error: 'Order is canceled' });
     }
 
-    // const recipient = await Recipient.findByPk(order.recipient_id);
-
     order.canceled_at = new Date();
 
     await order.save();

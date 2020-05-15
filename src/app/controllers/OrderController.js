@@ -131,7 +131,6 @@ class OrderController {
       return res.status(400).json({ error: 'You are not is administrador' });
     }
 
-    // const { id, recipient_id, deliveryman_id } = req.body;
     const { id } = req.params;
 
     const order = await Order.findByPk(id);

@@ -1,11 +1,7 @@
-import jwt from 'jsonwebtoken';
-
 import User from '../models/User';
 import Courier from '../models/Courier';
 import File from '../models/File';
 import Order from '../models/Order';
-
-import authConfig from '../../config/auth';
 
 class CourierController {
   async index(req, res) {
@@ -126,14 +122,6 @@ class CourierController {
     const { id } = req.params;
 
     const deliveryman = await Courier.findByPk(id);
-
-    // if (name !== deliveryman.name) {
-    //   return res.status(400).json({ error: 'This name already exists' });
-    // }
-
-    // if (email !== deliveryman.email) {
-    //   return res.status(400).json({ error: 'This email already exists' });
-    // }
 
     const order = await Order.findOne({
       where: { deliveryman_id: id },

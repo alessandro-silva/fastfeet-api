@@ -88,12 +88,6 @@ class DeliverymanController {
 
     const order = await Order.findByPk(req.params.id);
 
-    // if (order.deliveryman_id !== req.userId) {
-    //   return res
-    //     .status(401)
-    //     .json({ error: "You don't have permission to start this order." });
-    // }
-
     order.signature_id = signature_id;
 
     order.end_date = new Date();
@@ -119,28 +113,22 @@ class DeliverymanController {
       ],
     });
 
-    // if (order.deliveryman_id !== req.userId) {
-    //   return res
-    //     .status(401)
-    //     .json({ error: "You don't have permission to cancel this order." });
-    // }
-
     order.canceled_at = new Date();
 
     await order.save();
 
-    await Mail.sendMail({
-      to: `${order.recipient.name} <${order.recipient.city}>`,
-      subject: 'Encomenda cancelada',
-      template: 'cancellation',
-      context: {
-        recipient: order.recipient.name,
-        deliveryman: order.deliveryman.name,
-        canceled: format(order.canceled_at, "'dia' dd 'de' MMMM', às' H:mm'h", {
-          locale: pt,
-        }),
-      },
-    });
+    // await Mail.sendMail({
+    //   to: `${order.recipient.name} <${order.recipient.city}>`,
+    //   subject: 'Encomenda cancelada',
+    //   template: 'cancellation',
+    //   context: {
+    //     recipient: order.recipient.name,
+    //     deliveryman: order.deliveryman.name,
+    //     canceled: format(order.canceled_at, "'dia' dd 'de' MMMM', às' H:mm'h", {
+    //       locale: pt,
+    //     }),
+    //   },
+    // });
 
     return res.json(order);
   }
