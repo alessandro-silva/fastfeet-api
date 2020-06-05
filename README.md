@@ -3,8 +3,10 @@
 </h1>
 
 <h3 align="center">
-  App de Gerenciamento de Transportadora Fictícia feito com Express
+  Fast Feet API
 </h3>
+
+> Uma API que ajuda você a gerenciar suas encomendas, entregas e entregadores de sua transportadora :art:
 
 <p align="center">
   <img align="center" src="https://i.ibb.co/jwyt10w/fastfeetlogin.png" alt="Web-Signin" border="0">
