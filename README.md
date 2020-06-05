@@ -19,10 +19,10 @@
 
 # :scroll: Sumário
 
-* [Recursos](#rocket-features)
-* [Instalação](#construction_worker-installation)
-* [Introdução](#runner-getting-started)
-* [perguntas frequentes](#postbox-faq)
+* [Recursos](#dart-recursos)
+* [Instalação](#wrench-instalação)
+* [Introdução](#surfer-introdução)
+* [perguntas frequentes](#interrobang-perguntas-frequentes)
 
 # :dart: Recursos
 
@@ -81,3 +81,5 @@ FastFeet retorna os seguintes códigos de status em sua API:
 **Pergunta:** Quais são as tecnologias utilizadas neste projeto?
 
 **Resposta:** As tecnologias usadas neste projeto são [NodeJS](https://nodejs.org/en/) + [Express Framework](http://expressjs.com/en/) para lidar com o servidor e [Sequelize](https://sequelize.org/)
+
+Feito por [Alessandro Silva] (https://github.com/alessandro-silva) :book::earth_americas:
