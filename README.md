@@ -6,9 +6,6 @@
   App de Gerenciamento de Transportadora Fictícia feito com Express
 </h3>
 
-### :package: Sobre o Projeto
-
-
 <p align="center">
   <img align="center" src="https://i.ibb.co/jwyt10w/fastfeetlogin.png" alt="Web-Signin" border="0">
 </p>
