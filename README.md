@@ -82,6 +82,6 @@ FastFeet retorna os seguintes códigos de status em sua API:
 
 **Resposta:** As tecnologias usadas neste projeto são [NodeJS](https://nodejs.org/en/) + [Express Framework](http://expressjs.com/en/) para lidar com o servidor e [Sequelize](https://sequelize.org/)
 
-#:
+#
 
 Feito por [Alessandro Silva] (https://github.com/alessandro-silva) :book::earth_americas:
