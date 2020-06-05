@@ -84,4 +84,4 @@ FastFeet retorna os seguintes códigos de status em sua API:
 
 #
 
-Feito por [Alessandro Silva] (https://github.com/alessandro-silva) :book::earth_americas:
+Feito por [Alessandro Silva](https://github.com/alessandro-silva) :book::earth_americas:
