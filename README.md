@@ -6,7 +6,7 @@
   Fast Feet API
 </h3>
 
-> Uma API que ajuda você a gerenciar suas encomendas, entregas e entregadores de sua transportadora :rocket:
+> Uma API que ajuda você a gerenciar suas encomendas, destinatários e entregadores de sua transportadora :rocket:
 
 <p align="center">
   <img align="center" src="https://i.ibb.co/jwyt10w/fastfeetlogin.png" alt="Web-Signin" border="0">
